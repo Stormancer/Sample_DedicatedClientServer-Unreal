@@ -1,5 +1,5 @@
 # Installation
-To use this sample project, you will have to download the latest resource release, and copy and paste the folder Resources into : 
+To use this sample project, you will have to download [the correct resource release](https://github.com/Stormancer/Sample_DedicatedClientServer-Unreal/releases "Stormancer Third party release"), and copy and paste the folder Resources into : 
 
 Sample_DedicatedClientServer_Unreal\DedicatedServer\Plugins\UEStormancerPlugin\ 
 
