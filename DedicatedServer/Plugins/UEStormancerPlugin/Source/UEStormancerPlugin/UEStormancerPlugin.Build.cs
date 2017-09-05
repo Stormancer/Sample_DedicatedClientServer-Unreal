@@ -4,25 +4,59 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnrealBuildTool;
+using System.Diagnostics;
+using System.Collections.Generic;
+
 namespace UnrealBuildTool.Rules
 {
+
+    struct SetupInfo
+    {
+        public string _DownloadPath;
+        public string _Version;
+        public string _FileName;
+        public string _InstallPath;
+
+        public SetupInfo(string DownloadPath, string Version, string FileName, string InstallPath)
+        {
+            _DownloadPath = DownloadPath;
+            _Version = Version;
+            _FileName = FileName;
+            _InstallPath = InstallPath;
+        }
+    }
+
     public class UEStormancerPlugin : ModuleRules
     {
+        Dictionary<string, SetupInfo> SetupInfoMap = new Dictionary<string, SetupInfo>();
+
         private string VS_TOOLSET = "140";
 
         private string SDK_LIB_PATH = "";
-        private string DCS_LIB_PATH = ""; 
-        
-        private string SDK_HEADER_PATH = ""; 
-        private string DCS_HEADER_PATH = ""; 
+        private string SDK_HEADER_PATH = "";
+        private string SDK_DOWNLOAD_PATH = "https://github.com/Stormancer/stormancer-sdk-cpp/releases/download";
+        private string SDK_VERSION = "v1.2";
+        private string SDK_FILENAME = "Stormancer-cpp-1.2.zip";
+        private string SDK_INSTALL_PATH = "";
+
+        private string DCS_LIB_PATH = "";
+        private string DCS_HEADER_PATH = "";
+        private string DCS_DOWNLOAD_PATH = "https://github.com/Stormancer/Sample_DedicatedClientServer/releases/download";
+        private string DCS_VERSION = "1.0";
+        private string DCS_FILENAME = "Stormancer_DCS_1.0.zip";
+        private string DCS_INSTALL_PATH = "";
 
         public UEStormancerPlugin(ReadOnlyTargetRules Target) : base(Target)
 	    {
-            SDK_LIB_PATH = ModuleDirectory + "/../../Resources/Stormancer/Libs/";
-            SDK_HEADER_PATH = ModuleDirectory + "/../../Resources/Stormancer/Public/";
+            SDK_LIB_PATH = ModuleDirectory + "/../../Resources/Stormancer/libs/";
+            SDK_HEADER_PATH = ModuleDirectory + "/../../Resources/Stormancer/include/";
+            SDK_INSTALL_PATH = ModuleDirectory + "/../../Resources/Stormancer";
+            SetupInfoMap.Add("Stormancer", new SetupInfo(SDK_DOWNLOAD_PATH, SDK_VERSION, SDK_FILENAME, SDK_INSTALL_PATH));
 
             DCS_LIB_PATH = ModuleDirectory + "/../../Resources/DCS/Libs/";
             DCS_HEADER_PATH = ModuleDirectory + "/../../Resources/DCS/Public/";
+            DCS_INSTALL_PATH = ModuleDirectory + "/../../Resources/DCS";
+            SetupInfoMap.Add("DCS_OnlineModule", new SetupInfo(DCS_DOWNLOAD_PATH, DCS_VERSION, DCS_FILENAME, DCS_INSTALL_PATH));
 
             LoadLibrary(Target, DCS_HEADER_PATH, DCS_LIB_PATH, "DCS_OnlineModule");
 
@@ -88,10 +122,20 @@ namespace UnrealBuildTool.Rules
             var full_include_path = Path.Combine(PluginPath, include_path);
             if (!Directory.Exists(full_include_path))
             {
-                Fail("Invalid include path: " + full_include_path);
+                //Fail("Invalid include path: " + full_include_path);
+                Trace("Missing include files at : {0}", full_include_path);
+                DownloadResources(SetupInfoMap[library_name]);
+
             }
             else
             {
+                SetupInfo info = SetupInfoMap[library_name];
+                string versionFile = info._InstallPath + "\\" + info._FileName.Substring(0, info._FileName.Length-4);
+                if (!File.Exists(versionFile))
+                {
+                    //File exists but it's not up-to-date
+                    DownloadResources(SetupInfoMap[library_name]);
+                }
                 PublicIncludePaths.Add(full_include_path);
                 Trace("Added include path: {0}", full_include_path);
             } 
@@ -216,6 +260,29 @@ namespace UnrealBuildTool.Rules
                 return new DirectoryInfo(PluginPath).Name;
             }
         }
+
+        void DownloadResources(SetupInfo info)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo(); // Maybe wrong I Think this is not launching a right powershell exe as I an launch it correctly with the arguments
+            startInfo.FileName = "Powershell.exe";
+            startInfo.Arguments = ModuleDirectory + "/../../SetupResources.ps1 -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath;
+     
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            Process process = new Process();
+            process.StartInfo = startInfo;
+
+            process.OutputDataReceived += (s, e) => Trace(e.Data);
+            process.ErrorDataReceived += (s, e) => Trace(e.Data);
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            process.WaitForExit();
+        }
     }
+
 }
 
