@@ -265,8 +265,10 @@ namespace UnrealBuildTool.Rules
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(); // Maybe wrong I Think this is not launching a right powershell exe as I an launch it correctly with the arguments
             startInfo.FileName = "Powershell.exe";
-            startInfo.Arguments = ModuleDirectory + "/../../SetupResources.ps1 -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath;
-     
+            string scriptPath = ModuleDirectory + "/../../SetupResources.ps1";
+            startInfo.Arguments = "Unblock-File -Path "+ scriptPath+"; " + scriptPath+" -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath;
+            Trace(startInfo.Arguments);
+
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;
