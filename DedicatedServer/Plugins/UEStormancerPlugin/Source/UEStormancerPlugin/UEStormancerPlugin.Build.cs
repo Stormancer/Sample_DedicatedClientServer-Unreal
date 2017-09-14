@@ -54,7 +54,7 @@ namespace UnrealBuildTool.Rules
             SetupInfoMap.Add("Stormancer", new SetupInfo(SDK_DOWNLOAD_PATH, SDK_VERSION, SDK_FILENAME, SDK_INSTALL_PATH));
 
             DCS_LIB_PATH = ModuleDirectory + "/../../Resources/DCS/Libs/";
-            DCS_HEADER_PATH = ModuleDirectory + "/../../Resources/DCS/Public/";
+            DCS_HEADER_PATH = ModuleDirectory + "/../../Resources/DCS/Includes/";
             DCS_INSTALL_PATH = ModuleDirectory + "/../../Resources/DCS";
             SetupInfoMap.Add("DCS_OnlineModule", new SetupInfo(DCS_DOWNLOAD_PATH, DCS_VERSION, DCS_FILENAME, DCS_INSTALL_PATH));
 
@@ -98,8 +98,7 @@ namespace UnrealBuildTool.Rules
                     "CoreUObject",
                     "Engine",
                     "Slate",
-                    "SlateCore",
-                    "DedicatedServer", // Game module used to access game function from plugin.
+                    "SlateCore"
 			     }
                 );
 
