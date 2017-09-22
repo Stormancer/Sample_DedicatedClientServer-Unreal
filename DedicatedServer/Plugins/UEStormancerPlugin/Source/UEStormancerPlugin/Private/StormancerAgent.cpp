@@ -40,6 +40,7 @@ void AStormancerAgent::Init()
 	char *buffer = new char[256];
 	//Get connection token passed as environment variable when the Stormancer app starts the server
 	auto err_no = _dupenv_s(&buffer, &len, "connectionToken");
+	
 
 	if (err_no || !len)
 	{
@@ -232,7 +233,38 @@ void AStormancerAgent::StartStormancerServer(char* buffer)
 std::shared_ptr<SampleDCS::IClientDCS> AStormancerAgent::CreateStormancerClient()
 {
 	FString reason = "";
+	FString endpoint;
+	if (FParse::Value(FCommandLine::Get(), TEXT("Endpoint"), endpoint)) {
+		endpoint = endpoint.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
+		_endPoint = endpoint;
+		UE_LOG(LogTemp, Warning, TEXT("Endpoint : %s"), *_endPoint);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Endpoint"));
+	}
+	FString accountName;
+	if (FParse::Value(FCommandLine::Get(), TEXT("AccountName"), accountName)) {
+		accountName = accountName.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
+		_accountID = accountName;
+		UE_LOG(LogTemp, Warning, TEXT("AccountId : %s"), *_accountID);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No AccountId"));
+	}
+	FString applicationName;
+	if (FParse::Value(FCommandLine::Get(), TEXT("ApplicationName"), applicationName)) {
+		applicationName = applicationName.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
+		_applicationName = applicationName;
+		UE_LOG(LogTemp, Warning, TEXT("ApplicationName : %s"), *_applicationName);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No ApplicationName"));
+	}
 
+	// @TODO: Connection token
 	std::string endPoint = TCHAR_TO_UTF8(*(_endPoint));
 	// Check end point
 	if (endPoint.length() == 0)
