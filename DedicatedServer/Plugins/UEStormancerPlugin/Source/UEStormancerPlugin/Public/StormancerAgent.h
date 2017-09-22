@@ -21,6 +21,12 @@ enum class EStormancerConnectionStatus : uint8
 	CONNECTED						UMETA(DisplayName = "Connected")
 };
 
+UENUM(BlueprintType)
+enum class EStormancerShutdownMode : uint8
+{
+	NO_PLAYER_LEFT 					UMETA(DisplayName = "No player left"),
+	SCENE_SHUTDOWN	 				UMETA(DisplayName = "Scene shutdown")
+};
 
 UCLASS(config = Game, defaultconfig)
 class AStormancerAgent : public AActor
@@ -65,6 +71,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UEStormancerPlugin/Server")
 	EStormancerConnectionStatus GetConnectionStatus();
+
+	UFUNCTION(BlueprintCallable, Category = "UEStormancerPlugin/Server")
+	void UpdateShutdownMode(EStormancerShutdownMode mode, uint8 keepServerAliveFor);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TravelAgentToMap", Keywords = "UEStormancerPlugin"), Category = "UEStormancerPlugin")
 	void TravelAgentToMap(FString mapId);

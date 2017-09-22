@@ -3,6 +3,7 @@
 #include "UEStormancerPlugin/Public/StormancerAgent.h"
 #include "Kismet/GameplayStatics.h"
 #include "UEStormancerPluginBPLibrary.h"
+#include "IServerDCS.h"
 #include "Base64.h"
 #include <thread>
  
@@ -147,6 +148,11 @@ void AStormancerAgent::OnConnectionStatusChange_Implementation(EStormancerConnec
 EStormancerConnectionStatus AStormancerAgent::GetConnectionStatus()
 {
 	return _clientDCS ? (EStormancerConnectionStatus)_clientDCS->GetConnectionStatus() : (EStormancerConnectionStatus)0;
+}
+
+void AStormancerAgent::UpdateShutdownMode(EStormancerShutdownMode mode, uint8 keepServerAliveFor)
+{
+	// WORK IN PROGRESS
 }
 
 void AStormancerAgent::TravelAgentToMap(FString mapId)
