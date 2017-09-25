@@ -42,8 +42,8 @@ namespace UnrealBuildTool.Rules
         private string DCS_LIB_PATH = "";
         private string DCS_HEADER_PATH = "";
         private string DCS_DOWNLOAD_PATH = "https://github.com/Stormancer/Sample_DedicatedClientServer/releases/download";
-        private string DCS_VERSION = "1.0";
-        private string DCS_FILENAME = "Stormancer_DCS_1.0.zip";
+        private string DCS_VERSION = "1.01";
+        private string DCS_FILENAME = "Stormancer_DCS_1.01.zip";
         private string DCS_INSTALL_PATH = "";
 
         public UEStormancerPlugin(ReadOnlyTargetRules Target) : base(Target)
