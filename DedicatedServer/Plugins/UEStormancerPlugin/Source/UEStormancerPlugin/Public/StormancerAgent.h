@@ -73,7 +73,7 @@ public:
 	EStormancerConnectionStatus GetConnectionStatus();
 
 	UFUNCTION(BlueprintCallable, Category = "UEStormancerPlugin/Server")
-	void UpdateShutdownMode(EStormancerShutdownMode mode, uint8 keepServerAliveFor);
+	void UpdateShutdownMode(EStormancerShutdownMode mode, int32 keepServerAliveFor);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TravelAgentToMap", Keywords = "UEStormancerPlugin"), Category = "UEStormancerPlugin")
 	void TravelAgentToMap(FString mapId);
