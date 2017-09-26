@@ -15,7 +15,7 @@ AStormancerAgent::AStormancerAgent()
 }
 
 // Called when the game starts or when spawned
-void AStormancerAgent::BeginPlay()
+void AStormancerAgent::BeginPlay() 
 {
 	Super::BeginPlay();
 	this->OnDestroyed.AddDynamic(this, &AStormancerAgent::ResetObject);
@@ -153,7 +153,6 @@ EStormancerConnectionStatus AStormancerAgent::GetConnectionStatus()
 
 void AStormancerAgent::UpdateShutdownMode(EStormancerShutdownMode shutdownMode, int32 keepServerAliveFor)
 {
-	// WORK IN PROGRESS
 	if (_serverDCS != nullptr)
 	{
 		SampleDCS::UpdateShutdownModeParameter param = SampleDCS::UpdateShutdownModeParameter();
