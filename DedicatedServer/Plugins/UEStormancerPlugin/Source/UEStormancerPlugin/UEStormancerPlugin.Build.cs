@@ -16,13 +16,15 @@ namespace UnrealBuildTool.Rules
         public string _Version;
         public string _FileName;
         public string _InstallPath;
+        public string _TempPath;
 
-        public SetupInfo(string DownloadPath, string Version, string FileName, string InstallPath)
+        public SetupInfo(string DownloadPath, string Version, string FileName, string InstallPath, string tempPath)
         {
             _DownloadPath = DownloadPath;
             _Version = Version;
             _FileName = FileName;
             _InstallPath = InstallPath;
+            _TempPath = tempPath;
         }
     }
 
@@ -31,6 +33,7 @@ namespace UnrealBuildTool.Rules
         Dictionary<string, SetupInfo> SetupInfoMap = new Dictionary<string, SetupInfo>();
 
         private string VS_TOOLSET = "140";
+        private string TEMP_PATH = "D:\\Temp";
 
         private string SDK_LIB_PATH = "";
         private string SDK_HEADER_PATH = "";
@@ -51,12 +54,12 @@ namespace UnrealBuildTool.Rules
             SDK_LIB_PATH = ModuleDirectory + "/../../Resources/Stormancer/libs/";
             SDK_HEADER_PATH = ModuleDirectory + "/../../Resources/Stormancer/include/";
             SDK_INSTALL_PATH = ModuleDirectory + "/../../Resources/Stormancer";
-            SetupInfoMap.Add("Stormancer", new SetupInfo(SDK_DOWNLOAD_PATH, SDK_VERSION, SDK_FILENAME, SDK_INSTALL_PATH));
+            SetupInfoMap.Add("Stormancer", new SetupInfo(SDK_DOWNLOAD_PATH, SDK_VERSION, SDK_FILENAME, SDK_INSTALL_PATH, TEMP_PATH));
 
             DCS_LIB_PATH = ModuleDirectory + "/../../Resources/DCS/Libs/";
             DCS_HEADER_PATH = ModuleDirectory + "/../../Resources/DCS/Includes/";
             DCS_INSTALL_PATH = ModuleDirectory + "/../../Resources/DCS";
-            SetupInfoMap.Add("DCS_OnlineModule", new SetupInfo(DCS_DOWNLOAD_PATH, DCS_VERSION, DCS_FILENAME, DCS_INSTALL_PATH));
+            SetupInfoMap.Add("DCS_OnlineModule", new SetupInfo(DCS_DOWNLOAD_PATH, DCS_VERSION, DCS_FILENAME, DCS_INSTALL_PATH, TEMP_PATH));
 
             LoadLibrary(Target, DCS_HEADER_PATH, DCS_LIB_PATH, "DCS_OnlineModule");
 
@@ -265,7 +268,7 @@ namespace UnrealBuildTool.Rules
             ProcessStartInfo startInfo = new ProcessStartInfo(); // Maybe wrong I Think this is not launching a right powershell exe as I an launch it correctly with the arguments
             startInfo.FileName = "Powershell.exe";
             string scriptPath = ModuleDirectory + "/../../SetupResources.ps1";
-            startInfo.Arguments = "Unblock-File -Path "+ scriptPath+"; " + scriptPath+" -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath;
+            startInfo.Arguments = "Unblock-File -Path "+ scriptPath+"; " + scriptPath+" -DownloadPath " + info._DownloadPath + " -Version " + info._Version + " -FileName " + info._FileName + " -InstallPath " + info._InstallPath + " -TempPath " + info._TempPath;
             Trace(startInfo.Arguments);
 
             startInfo.RedirectStandardOutput = true;

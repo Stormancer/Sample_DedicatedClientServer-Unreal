@@ -1,18 +1,27 @@
 param(
-    [string]$DownloadPath = "https://github.com/Stormancer/Sample_DedicatedClientServer-Unreal/releases/download",
-    [string]$Version = "1.0", 
-    [string]$FileName = "Resources.zip", 
-    [string]$InstallPath = "C:\Workspace\Sample_DedicatedClientServer-Unreal\DedicatedServer\Plugins\UEStormancerPlugin\Resources"
+    [string]$DownloadPath = "https://github.com/Stormancer/Sample_DedicatedClientServer/releases/download",
+    [string]$Version = "1.01", 
+    [string]$FileName = "Stormancer_DCS_1.01.zip", 
+    [string]$InstallPath = "C:\Workspace\Sample_DedicatedClientServer-Unreal\DedicatedServer\Plugins\UEStormancerPlugin\Resources\DCS",
+    [string]$TempPath = "D:\Temp"
 )
 
 Write-Host "DownloadPath = $($DownloadPath)"
 Write-Host "Version = $($Version)"
 Write-Host "FileName = $($FileName)"
 Write-Host "InstallPath = $($InstallPath)"
+Write-Host "TempPath = $($TempPath)"
 
-$TempFolder
-New-TemporaryFile | %{ rm $_; $TempFolder = $_; mkdir $_ } | Out-Null
+$TempFolder 
+$TempFolder = $((Get-Date).ToString('u')) -replace ':','_'
+$TempFolder = "$($TempPath)\$($TempFolder)"
+
+New-Item -ItemType Directory -Path $TempFolder | Out-Null
+#New-TemporaryFile | %{ rm $_; $TempFolder = $_; mkdir $_ } | Out-Null
 $TempDownload = "$($TempFolder)\$($FileName)"
+
+
+$FullDownloadName = "$($DownloadPath)/$($Version)/$($FileName)"
 
 Function DownloadFile 
 {
@@ -21,7 +30,6 @@ Function DownloadFile
 	$client.DownloadFile($FullDownloadName, $TempDownload)
 } 
 
-$FullDownloadName = "$($DownloadPath)/$($Version)/$($FileName)"
 
 DownloadFile
 
@@ -37,7 +45,7 @@ if(Test-Path -Path $InstallPath)
 $ExpandFolderName = (Get-Item $TempDownload ).Basename
 $expandPath = "$($TempFolder)\$($ExpandFolderName)"
 New-Item -ItemType Directory -Force -Path $expandPath | Out-Null
-Expand-Archive -Path $TempDownload -DestinationPath $expandPath
+(new-object -com shell.application).NameSpace($expandPath).CopyHere((new-object -com shell.application).NameSpace($TempDownload).Items())
 
 # Get expand Content path
 if(!(test-path $InstallPath))
@@ -46,4 +54,5 @@ if(!(test-path $InstallPath))
 }
 $versionFile = (Get-Item $expandPath ).Basename
 New-Item -ItemType File -Force -Path "$($InstallPath)\$($versionFile)"  | Out-Null
-Get-ChildItem -Path $expandPath | Move-Item -Destination $InstallPath
+#Get-ChildItem -Directory -Path $expandPath | New-Item -ItemType Directory -Force -Path Select-Object Fullname | Out-Null
+Get-ChildItem -Path $expandPath | Copy-Item -Recurse -Destination $InstallPath

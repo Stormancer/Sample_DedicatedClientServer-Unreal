@@ -276,8 +276,16 @@ std::shared_ptr<SampleDCS::IClientDCS> AStormancerAgent::CreateStormancerClient(
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No ApplicationName"));
 	}
+	FString _connectionToken;
+	if (FParse::Value(FCommandLine::Get(), TEXT("ConnectionToken"), _connectionToken)) {
+		_connectionToken = _connectionToken.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
+		UE_LOG(LogTemp, Warning, TEXT("ConnectionToken : %s"), *_connectionToken);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No ConnectionToken"));
+	}
 
-	// @TODO: Connection token
 	std::string endPoint = TCHAR_TO_UTF8(*(_endPoint));
 	// Check end point
 	if (endPoint.length() == 0)
@@ -288,8 +296,9 @@ std::shared_ptr<SampleDCS::IClientDCS> AStormancerAgent::CreateStormancerClient(
 
 	std::string accountID = TCHAR_TO_UTF8(*(_accountID));
 	std::string appName = TCHAR_TO_UTF8(*(_applicationName));
-	std::shared_ptr <SampleDCS::IClientDCS > clientDCS = SampleDCS::IClientDCS::MakeClientDCS(180, endPoint, accountID, appName, 10);
-	
+	std::string connectionToken = TCHAR_TO_UTF8(*(_connectionToken));
+	std::shared_ptr <SampleDCS::IClientDCS > clientDCS = SampleDCS::IClientDCS::MakeClientDCS(180, endPoint, accountID, appName, 10, connectionToken);
+
 	return clientDCS;
 }
 
