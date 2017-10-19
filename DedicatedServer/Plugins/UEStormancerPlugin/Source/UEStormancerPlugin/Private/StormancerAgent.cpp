@@ -245,55 +245,59 @@ void AStormancerAgent::StartStormancerServer(char* buffer)
 
 std::shared_ptr<SampleDCS::IClientDCS> AStormancerAgent::CreateStormancerClient()
 {
-	FString reason = "";
-	FString endpoint;
-	if (FParse::Value(FCommandLine::Get(), TEXT("Endpoint"), endpoint)) {
-		endpoint = endpoint.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
-		_endPoint = endpoint;
-		UE_LOG(LogTemp, Warning, TEXT("Endpoint : %s"), *_endPoint);
-	}
-	else
+	size_t len = 256;
+	char *buffer = new char[256];
+	//Get connection token passed as environment variable when the Stormancer app starts the server
+	auto err_no = _dupenv_s(&buffer, &len, "ENDPOINT");
+	if (err_no || !len)
 	{
+
 		UE_LOG(LogTemp, Warning, TEXT("No Endpoint"));
 	}
-	FString accountName;
-	if (FParse::Value(FCommandLine::Get(), TEXT("AccountName"), accountName)) {
-		accountName = accountName.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
-		_accountID = accountName;
-		UE_LOG(LogTemp, Warning, TEXT("AccountId : %s"), *_accountID);
+	else
+	{
+		_endPoint = FString(buffer);
+		UE_LOG(LogTemp, Warning, TEXT("Endpoint : %s"), *_endPoint);
+	}
+
+	err_no = _dupenv_s(&buffer, &len, "ACCOUNT_NAME");
+	if (err_no || !len)
+	{
+
+		UE_LOG(LogTemp, Warning, TEXT("No AccountName"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No AccountId"));
+		_accountID = FString(buffer);
+		UE_LOG(LogTemp, Warning, TEXT("AccountName : %s"), *_accountID);
 	}
-	FString applicationName;
-	if (FParse::Value(FCommandLine::Get(), TEXT("ApplicationName"), applicationName)) {
-		applicationName = applicationName.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
-		_applicationName = applicationName;
-		UE_LOG(LogTemp, Warning, TEXT("ApplicationName : %s"), *_applicationName);
-	}
-	else
+
+	err_no = _dupenv_s(&buffer, &len, "APPLICATION_NAME");
+	if (err_no || !len)
 	{
+
 		UE_LOG(LogTemp, Warning, TEXT("No ApplicationName"));
 	}
+	else
+	{
+		_applicationName = FString(buffer);
+		UE_LOG(LogTemp, Warning, TEXT("ApplicationName : %s"), *_applicationName);
+	}
+
 	FString _connectionToken;
-	if (FParse::Value(FCommandLine::Get(), TEXT("ConnectionToken"), _connectionToken)) {
-		_connectionToken = _connectionToken.Replace(TEXT("="), TEXT("")).Replace(TEXT("\""), TEXT("")); // replace quotes
-		UE_LOG(LogTemp, Warning, TEXT("ConnectionToken : %s"), *_connectionToken);
+	err_no = _dupenv_s(&buffer, &len, "CONNECTION_TOKEN");
+	if (err_no || !len)
+	{
+
+		UE_LOG(LogTemp, Warning, TEXT("No ConnectionToken"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No ConnectionToken"));
+		_connectionToken = FString(buffer);
+		UE_LOG(LogTemp, Warning, TEXT("ConnectionToken : %s"), *_connectionToken);
 	}
-
+	
 	std::string endPoint = TCHAR_TO_UTF8(*(_endPoint));
-	// Check end point
-	if (endPoint.length() == 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Endpoint property not set"));
-		return nullptr;
-	}
-
 	std::string accountID = TCHAR_TO_UTF8(*(_accountID));
 	std::string appName = TCHAR_TO_UTF8(*(_applicationName));
 	std::string connectionToken = TCHAR_TO_UTF8(*(_connectionToken));
